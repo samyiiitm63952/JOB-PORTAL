@@ -9,6 +9,16 @@ import userRoute from "./routes/user.routes.js";
 dotenv.config({})
 const app = express();
 
+const corsOptions = {
+    origin: true,  // allows all origins including Postman
+    credentials: true,
+}
+app.use(cors(corsOptions));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 app.get("/",(req,res)=>{
     return res.status(200).json({
         message: "Welcome to the API!",
@@ -16,16 +26,6 @@ app.get("/",(req,res)=>{
         success: true,
     })
 })
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-const corsOptions = {
-    origin: ["http://localhost:5121"],
-    credentials: true,
-}
-app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 5001
 
