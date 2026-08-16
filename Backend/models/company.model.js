@@ -2,7 +2,8 @@ import mongoose from "mongoose"
 const companyschema = new mongoose.Schema({
     name:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     description:{
         type:String,
@@ -18,7 +19,7 @@ const companyschema = new mongoose.Schema({
     logo:{
         type:String,
     },
-    usertId:[{
+    userId:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
         required:true
