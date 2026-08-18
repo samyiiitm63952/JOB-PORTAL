@@ -134,7 +134,7 @@ export const updateProfile = async (req,res)=>{
 
         let skillsArray;
         if(skills){
-            const skillsArray = skills.split(',');
+            skillsArray = skills.split(',');
         }
 
         

@@ -40,11 +40,10 @@ const jobSchema = new mongoose.Schema({
         ref:"User",
         required:true
     },
-    application:{
+    application:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Application",
-        default:null
-    }
+    }]
 })
 
 export const Job = mongoose.model("Job",jobSchema);
