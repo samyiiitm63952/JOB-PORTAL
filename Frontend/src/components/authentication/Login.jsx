@@ -3,14 +3,17 @@ import Navbar from '../components_lite/Navbar'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { USER_API_ENDPOINT } from '@/utils/data'
+import { toast } from 'sonner'
 import axios from 'axios'
 
 const Login = () => {
     const navigate = useNavigate()
     const [input, setInput] = useState({
         email: "",
-        password: ""
+        password: "",
+        role: ""
     });
 
     const changeEventHandler = (e) => {
@@ -18,30 +21,23 @@ const Login = () => {
             ...input, [e.target.name]: e.target.value
         });
     }
-    const ChangeFilehandler = (e) => {
-        setInput({ ...input, file: e.target.files?.[0] })
-    }
 
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            if (input.file) {
-                formData.append("file", input.file);
-            }
-            const res = await axios.post(`${USER_API_ENDPOINT}/login`,input,{
-                headers:{
-                    "Content-Type":"application/json"
+            const res = await axios.post(`${USER_API_ENDPOINT}/login`, input, {
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                withCredentials:true
+                withCredentials: true
             })
-            if(res.data.success){
+            if (res.data.success) {
                 navigate("/");
                 toast.success(res.data.message)
-
             }
         } catch (error) {
             console.log(error);
-            const ermsg = error.response?error.response.data.message:"An unexpected error occured"
+            const ermsg = error.response ? error.response.data.message : "An unexpected error occured"
             toast.error(ermsg)
         }
     }
@@ -63,11 +59,11 @@ const Login = () => {
                     <div className='flex items-center justify-between'>
                         <RadioGroup defaultValue="comfortable" className="flex items-center gap-4 my-5">
                             <div className="flex items-center gap-3">
-                                <Input type="radio" name="role" value="Student" onChange={changeEventHandler} checked={input.role==='Student'} classname="cursor-pointer"></Input>
+                                <Input type="radio" name="role" value="Student" onChange={changeEventHandler} checked={input.role==='Student'} className="cursor-pointer"></Input>
                                 <Label htmlFor="r1">Student</Label>
                             </div>
                             <div className="flex items-center gap-3">
-                               <Input type="radio" name="role" value="Recruiter" onChange={changeEventHandler} checked={input.role==='Recruiter'} classname="cursor-pointer"></Input>
+                               <Input type="radio" name="role" value="Recruiter" onChange={changeEventHandler} checked={input.role==='Recruiter'} className="cursor-pointer"></Input>
                                 <Label htmlFor="r2">Recruiter</Label>
                             </div>
                         </RadioGroup>

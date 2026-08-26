@@ -41,23 +41,24 @@ const Register = () => {
             if (input.file) {
                 formData.append("file", input.file);
             }
-            const res = await axios.post(`${USER_API_ENDPOINT}/register`,formData,{
-                headers:{
-                    "Content-Type":"multipart/form-data"
+            const res = await axios.post(`${USER_API_ENDPOINT}/register`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
                 },
-                withCredentials:true
+                withCredentials: true
             })
-            if(res.data.success){
+            if (res.data.success) {
                 navigate("/login");
                 toast.success(res.data.message)
 
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message)
+            const errorMessage = error.response?error.response.data.message:"An unexpected error occured";
+            toast.error(errorMessage); 
         }
     }
-
+    
     return (
         <div>
             <Navbar></Navbar>
@@ -85,18 +86,18 @@ const Register = () => {
                     <div className='flex items-center justify-between'>
                         <RadioGroup defaultValue="comfortable" className="flex items-center gap-4 my-5">
                             <div className="flex items-center gap-3">
-                                <Input type="radio" name="role" value="Student" onChange={changeEventHandler} checked={input.role === 'Student'} classname="cursor-pointer"></Input>
+                                <Input type="radio" name="role" value="Student" onChange={changeEventHandler} checked={input.role === 'Student'} className="cursor-pointer"></Input>
                                 <Label htmlFor="r1">Student</Label>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Input type="radio" name="role" value="Recruiter" onChange={changeEventHandler} checked={input.role === 'Recruiter'} classname="cursor-pointer"></Input>
+                                <Input type="radio" name="role" value="Recruiter" onChange={changeEventHandler} checked={input.role === 'Recruiter'} className="cursor-pointer"></Input>
                                 <Label htmlFor="r2">Recruiter</Label>
                             </div>
                         </RadioGroup>
                     </div>
                     <div className='flex items-center gap-2'>
                         <Label>Profile Photo</Label>
-                        <Input type="file" accept="image/*" classname="cursor-pointer" ></Input>
+                        <Input type="file" accept="image/*" onChange={ChangeFilehandler} className="cursor-pointer" ></Input>
                     </div>
                     <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
                         Register
