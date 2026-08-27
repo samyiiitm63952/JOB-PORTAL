@@ -7,9 +7,15 @@ import { Link, useNavigate } from 'react-router-dom'
 import { USER_API_ENDPOINT } from '@/utils/data'
 import { toast } from 'sonner'
 import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { setLoading } from '@/redux/authSlice'
+import { Loader2 } from 'lucide-react'
+import { Button } from '../ui/button'
 
 const Login = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const {loading} = useSelector((store)=>store.auth);
     const [input, setInput] = useState({
         email: "",
         password: "",
@@ -25,6 +31,7 @@ const Login = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
+            dispatch(setLoading(true))
             const res = await axios.post(`${USER_API_ENDPOINT}/login`, input, {
                 headers: {
                     "Content-Type": "application/json"
@@ -39,6 +46,9 @@ const Login = () => {
             console.log(error);
             const ermsg = error.response ? error.response.data.message : "An unexpected error occured"
             toast.error(ermsg)
+        }
+        finally{
+            dispatch(setLoading(false))
         }
     }
     return (
@@ -68,9 +78,13 @@ const Login = () => {
                             </div>
                         </RadioGroup>
                     </div>
-                        <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
+                    {
+                        loading?<Button><Loader2 className='mr-2 h-4 w-4 animate-spin' /> </Button>: <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
                             Login
                         </button>
+                    }
+
+                       
                         {/* if no account then register*/}
                         <p className='text-gray-500 text-md my-2'>
                             No Account? <Link to="/register" className='text-blue-500 font-semibold'>Register </Link>
