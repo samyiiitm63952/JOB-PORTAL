@@ -93,6 +93,9 @@ export const getApplicants = async (req, res) => {
         return res.status(200).json({ job, success: true });
     } catch (err) {
         console.error(err);
+        return res.status(400).json({
+            message:"Server error"
+        })
     }
 }
 

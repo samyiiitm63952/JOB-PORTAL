@@ -178,7 +178,7 @@ export const updateProfile = async (req,res)=>{
     catch(err){
         console.error(err);
         res.status(404).json({
-            message:"profle upade failed",
+            message:"profle update failed",
             success:false
         })
     }

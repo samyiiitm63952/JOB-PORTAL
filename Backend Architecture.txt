@@ -1,0 +1,259 @@
+Let me first explore the backend structure to give you an accurate walkthrough.
+
+Listed directory Backend
+Listed directory controllers
+Listed directory models
+Listed directory routes
+Listed directory middleware
+Listed directory utils
+Viewed index.js:1-44
+Viewed db.js:1-11
+Viewed isAuthenticated.js:1-29
+Viewed multer.js:1-3
+Viewed user.model.js:1-51
+Viewed company.model.js:1-29
+Viewed job.model.js:1-49
+Viewed application.model.js:1-21
+Viewed user.routes.js:1-12
+Viewed company.route.js:1-11
+Viewed job.route.js:1-11
+Viewed application.route.js:1-14
+Viewed user.controller.js:1-185
+Viewed application.controller.js:1-129
+Viewed job.controller.js:1-139
+Viewed company.controller.js:1-86
+
+Now I have a complete picture of your backend. Here's a thorough explanation layer by layer:
+
+---
+
+## 🏗️ Backend Architecture — Job Portal
+
+Your backend follows the classic **MVC (Model-View-Controller)** pattern built on **Node.js + Express + MongoDB (Mongoose)**.
+
+---
+
+## 📁 Folder Structure Overview
+
+```
+Backend/
+├── index.js            ← Entry point (app bootstrap)
+├── utils/db.js         ← DB connection
+├── middleware/         ← Request interceptors
+├── models/             ← MongoDB schemas (data shape)
+├── routes/             ← URL definitions
+└── controllers/        ← Business logic
+```
+
+---
+
+## 1️⃣ `index.js` — The Entry Point
+
+**File:** [`index.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/index.js)
+
+This is where everything starts. It:
+- Creates the **Express app**
+- Registers **global middleware** (CORS, JSON parsing, cookies)
+- Mounts all **route groups** under `/api/...`
+- Starts the **HTTP server** and connects to DB
+
+```
+Request → Express App → Middleware → Routes → Controllers → DB
+```
+
+| Middleware | Purpose |
+|---|---|
+| `cors` | Allows frontend to talk to backend |
+| `express.json()` | Parses JSON request bodies |
+| `cookieParser()` | Reads cookies (used for JWT auth) |
+
+**API base paths:**
+| Prefix | Feature |
+|---|---|
+| `/api/users` | Auth & profile |
+| `/api/company` | Company management |
+| `/api/job` | Job listings |
+| `/api/application` | Job applications |
+
+---
+
+## 2️⃣ `utils/db.js` — Database Connection
+
+**File:** [`db.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/utils/db.js)
+
+- Connects to **MongoDB Atlas** using `mongoose.connect()`
+- Reads the URI from `.env` → `MONGODB_URI`
+- If connection fails → `process.exit(1)` (kills the server safely)
+
+---
+
+## 3️⃣ Middleware — Request Guards
+
+### [`isAuthenticated.js`](file:///c:/Users/samad/Downloads/JOB PORTAL/Backend/middleware/isAuthenticated.js)
+**JWT Authentication guard.** Every protected route passes through this first:
+1. Reads the `token` cookie from the request
+2. Verifies it using `JWT_SECRET`
+3. Decodes the `userId` and attaches it as `req.id`
+4. Calls `next()` to pass control to the controller
+
+### [`multer.js`](file:///c:/Users/samad/Downloads/JOB PORTAL/Backend/middleware/multer.js)
+**File upload handler.** Stores uploaded files in **memory (RAM)** (not disk), so they can be sent to Cloudinary (the upload code is a TODO comment in `updateProfile`).
+
+---
+
+## 4️⃣ Models — Database Schemas
+
+These define the **shape of data** stored in MongoDB.
+
+### [`user.model.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/models/user.model.js)
+```
+User {
+  fullname, email, phoneNumber, password (hashed),
+  role: "Student" | "Recruiter",
+  profile: { bio, skills[], resume, resumeOriginalname, company→ref, profilePhoto }
+}
+```
+
+### [`company.model.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/models/company.model.js)
+```
+Company {
+  name (unique), description, website, location, logo,
+  userId → [ref: User]  ← recruiters who own this company
+}
+```
+
+### [`job.model.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/models/job.model.js)
+```
+Job {
+  title, description, requirements[], location, salary, experience,
+  position, jobType,
+  company → ref: Company,
+  created_by → ref: User,
+  application → [ref: Application]
+}
+```
+
+### [`application.model.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/models/application.model.js)
+```
+Application {
+  job → ref: Job,
+  applicant → ref: User,
+  status: "pending" | "accepted" | "rejected"
+}
+```
+
+**Relationships diagram:**
+```
+User ──────────── creates ──────────► Job
+User ──────────── applies ──────────► Application ──► Job
+Company ◄──────── belongs to ──────── Job
+Company ◄──────── owned by ─────────  User (Recruiter)
+```
+
+---
+
+## 5️⃣ Routes — URL Definitions
+
+Routes map HTTP verbs + URLs → middleware + controllers.
+
+### [`user.routes.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/routes/user.routes.js)
+| Method | Path | Auth? | Controller |
+|---|---|---|---|
+| POST | `/api/users/register` | ❌ (with file upload) | `register` |
+| POST | `/api/users/login` | ❌ | `login` |
+| POST | `/api/users/profile/update` | ✅ | `updateProfile` |
+| GET | `/api/users/logout` | ❌ | `logout` |
+
+### [`company.route.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/routes/company.route.js)
+| Method | Path | Auth? | Controller |
+|---|---|---|---|
+| GET | `/api/company/get` | ✅ | `getAllCompanies` |
+| GET | `/api/company/get/:id` | ✅ | `getcompanyById` |
+| PUT | `/api/company/update/:id` | ✅ | `updateCompany` |
+| POST | `/api/company/register` | ✅ | `registerCompany` |
+
+### [`job.route.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/routes/job.route.js)
+| Method | Path | Auth? | Controller |
+|---|---|---|---|
+| POST | `/api/job/post` | ✅ | `postJob` |
+| GET | `/api/job/get` | ✅ | `getAllJobs` (with keyword search) |
+| GET | `/api/job/getadminjobs` | ✅ | `getAdminJobs` |
+| GET | `/api/job/get/:id` | ✅ | `getJobbyId` |
+
+### [`application.route.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/routes/application.route.js)
+| Method | Path | Auth? | Controller |
+|---|---|---|---|
+| GET | `/api/application/apply/:id` | ✅ | `applyjob` |
+| GET | `/api/application/get` | ✅ | `getAppliedjobs` |
+| GET | `/api/application/:id/applicants` | ✅ | `getApplicants` |
+| POST | `/api/application/status/:id/update` | ✅ | `updatestatus` |
+
+---
+
+## 6️⃣ Controllers — Business Logic
+
+### [`user.controller.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/controllers/user.controller.js)
+| Function | What it does |
+|---|---|
+| `register` | Validates fields, checks duplicate email, hashes password with **bcrypt**, saves user |
+| `login` | Verifies email+password+role, generates **JWT token**, sets it as **httpOnly cookie** (1 day) |
+| `logout` | Clears the `token` cookie (sets `maxAge: 0`) |
+| `updateProfile` | Updates user fields (name, bio, skills array split by comma); file upload is a TODO |
+
+### [`company.controller.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/controllers/company.controller.js)
+| Function | What it does |
+|---|---|
+| `registerCompany` | Creates a new company linked to the logged-in recruiter |
+| `getAllCompanies` | Fetches all companies owned by the logged-in user |
+| `getcompanyById` | Gets a single company by MongoDB `_id` |
+| `updateCompany` | Updates company details (logo upload is a TODO) |
+
+### [`job.controller.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/controllers/job.controller.js)
+| Function | What it does |
+|---|---|
+| `postJob` | Admin creates a job, linked to company + created_by user |
+| `getAllJobs` | Search jobs by keyword across 6 fields using MongoDB `$regex` |
+| `getJobbyId` | Get single job details |
+| `getAdminJobs` | Get all jobs created by the logged-in recruiter |
+
+### [`application.controller.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Backend/controllers/application.controller.js)
+| Function | What it does |
+|---|---|
+| `applyjob` | Student applies to a job; prevents duplicate applications; pushes application ID into Job doc |
+| `getAppliedjobs` | Get all jobs the logged-in student applied for (with nested populate: job → company) |
+| `getApplicants` | Recruiter sees all applicants for a job (nested populate: application → applicant) |
+| `updatestatus` | Recruiter updates application status to `pending/accepted/rejected` |
+
+---
+
+## 🔄 Full Request Flow (Example: Student applies for a job)
+
+```
+Client
+  │
+  ▼
+POST /api/application/apply/:jobId
+  │
+  ▼
+isAuthenticated middleware
+  ├─ reads cookie → verifies JWT → attaches req.id
+  │
+  ▼
+applyjob controller
+  ├─ checks duplicate application
+  ├─ checks job exists
+  ├─ creates Application document
+  ├─ pushes applicationId into Job.application[]
+  └─ returns 200 JSON response
+```
+
+---
+
+## ⚠️ Notable Things / TODOs in Your Code
+
+1. **Cloudinary upload is missing** — `updateProfile` and `updateCompany` have `req.file` but don't actually upload it anywhere yet.
+2. **`postJob` has a bug** — it checks `Job.findOne({ companyId })` but the field in schema is `company`, not `companyId`, so this check never works correctly.
+3. **Inconsistent status codes** — some errors return `404` when they should return `400` or `500`.
+4. **`getApplicants` has no error response** — the catch block is empty.
+
+Want me to fix any of these issues or explain any specific part in more depth?
