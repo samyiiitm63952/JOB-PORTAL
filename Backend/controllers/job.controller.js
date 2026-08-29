@@ -10,7 +10,7 @@ export const postJob = async (req, res) => {
                 success: false
             })
         }
-        let newJob = await Job.findOne({ companyId: companyId })
+        let newJob = await Job.findOne({ company: companyId ,title})
         if (newJob) {
             return res.status(404).json({
                 message: "Job is already posted",
