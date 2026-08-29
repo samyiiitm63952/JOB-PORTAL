@@ -1,0 +1,275 @@
+Let me explore the frontend structure first!
+
+Listed directory JOB%20PORTAL
+Listed directory Frontend
+Listed directory src
+Listed directory components
+Listed directory redux
+Listed directory utils
+Listed directory lib
+Listed directory authentication
+Listed directory components_lite
+Listed directory ui
+Viewed main.jsx:1-18
+Viewed App.jsx:1-30
+Viewed store.js:1-9
+Viewed authSlice.js:1-15
+Viewed Login.jsx:1-99
+Viewed Register.jsx:1-116
+Viewed Navbar.jsx:1-85
+Viewed Home.jsx:1-11
+Viewed data.js
+Viewed package.json:1-44
+Viewed utils.js:1-7
+
+Now I have a complete picture. Here's the full frontend architecture explained layer by layer:
+
+---
+
+## 🖥️ Frontend Architecture — Job Portal
+
+Your frontend is built with **React 19 + Vite + TailwindCSS + Redux Toolkit + ShadCN UI**.
+
+---
+
+## 📁 Folder Structure Overview
+
+```
+Frontend/src/
+├── main.jsx                    ← Entry point (mounts React app)
+├── App.jsx                     ← Route definitions
+├── index.css                   ← Global styles
+├── utils/data.js               ← API endpoint constants
+├── lib/utils.js                ← Utility helper (cn function)
+├── redux/                      ← Global state management
+│   ├── store.js
+│   └── authSlice.js
+└── components/
+    ├── authentication/         ← Auth pages
+    │   ├── Login.jsx
+    │   └── Register.jsx
+    ├── components_lite/        ← Layout/page components
+    │   ├── Home.jsx
+    │   └── Navbar.jsx
+    └── ui/                     ← Reusable ShadCN UI primitives
+        ├── button.jsx
+        ├── input.jsx
+        ├── label.jsx
+        ├── avatar.jsx
+        ├── popover.jsx
+        ├── radio-group.jsx
+        └── sonner.jsx
+```
+
+---
+
+## 1️⃣ `main.jsx` — The Entry Point
+
+**File:** [`main.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/main.jsx)
+
+This is where React boots up. It wraps the entire app in:
+
+| Wrapper | Purpose |
+|---|---|
+| `<StrictMode>` | Highlights potential React issues in development |
+| `<Provider store={store}>` | Makes Redux global state available to ALL components |
+| `<Toaster/>` | Renders toast notifications globally (from `sonner`) |
+
+```
+Browser → index.html → main.jsx → <Provider> → <App/> → Pages
+```
+
+---
+
+## 2️⃣ `App.jsx` — The Router
+
+**File:** [`App.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/App.jsx)
+
+Uses **React Router DOM v7** with `createBrowserRouter`. All pages/routes are defined here:
+
+| URL Path | Component Rendered |
+|---|---|
+| `/` | `<Home />` |
+| `/login` | `<Login />` |
+| `/register` | `<Register />` |
+
+> `RouterProvider` reads the URL and decides which component to display — no page reloads.
+
+---
+
+## 3️⃣ `utils/data.js` — API Constants
+
+**File:** [`data.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/utils/data.js)
+
+```js
+export const USER_API_ENDPOINT = "http://localhost:5011/api/users"
+```
+
+- A **single source of truth** for backend API URLs
+- Both `Login.jsx` and `Register.jsx` import this — so if the port changes, you update only **one file**
+
+---
+
+## 4️⃣ `lib/utils.js` — The `cn()` Helper
+
+**File:** [`utils.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/lib/utils.js)
+
+```js
+export function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
+```
+
+- `clsx` → conditionally joins class names
+- `twMerge` → merges Tailwind classes without conflicts
+- Used by all ShadCN UI components to safely combine class names
+
+---
+
+## 5️⃣ Redux — Global State Management
+
+### [`store.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/redux/store.js)
+The **central Redux store**. Currently has one slice registered:
+```js
+reducer: { auth: authReducer }
+```
+
+### [`authSlice.js`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/redux/authSlice.js)
+Manages **authentication-related global state**:
+
+| State | Initial Value | Purpose |
+|---|---|---|
+| `loading` | `false` | Shows spinner during API calls |
+
+**Action exported:**
+- `setLoading(true/false)` → dispatched before/after API calls in Login
+
+> ⚠️ **Note:** The `user` object is NOT stored in Redux yet — `Navbar.jsx` has `const user = false` hardcoded. This is a TODO.
+
+---
+
+## 6️⃣ Components
+
+### 🔐 `authentication/` — Auth Pages
+
+#### [`Login.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/components/authentication/Login.jsx)
+
+**How it works, step by step:**
+
+```
+1. useState manages form fields: { email, password, role }
+2. changeEventHandler → updates state on every keypress using [e.target.name]
+3. submitHandler:
+   ├─ dispatch(setLoading(true))       ← shows spinner
+   ├─ axios.POST /api/users/login      ← sends credentials
+   │    └─ withCredentials: true       ← allows cookie to be saved
+   ├─ on success → navigate("/")
+   ├─ on error   → toast.error(message)
+   └─ finally → dispatch(setLoading(false)) ← hides spinner
+4. JSX shows a Loader2 spinner while loading, else shows submit button
+```
+
+#### [`Register.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/components/authentication/Register.jsx)
+
+**Key difference from Login:** Uses **`FormData`** instead of JSON because it handles file uploads (profile photo).
+
+```
+1. useState: { fullname, email, password, role, phoneNumber, file }
+2. ChangeFilehandler → captures file from <input type="file">
+3. submitHandler:
+   ├─ Builds FormData with all fields + file
+   ├─ axios.POST /api/users/register  (multipart/form-data)
+   ├─ on success → navigate("/login")
+   └─ on error   → toast.error(message)
+```
+
+---
+
+### 🧩 `components_lite/` — Layout Components
+
+#### [`Navbar.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/components/components_lite/Navbar.jsx)
+
+Renders two states based on `user`:
+
+| `user = false` | `user = true` (TODO) |
+|---|---|
+| Login + Register buttons | Avatar with Popover (Profile & Logout) |
+
+- Uses **ShadCN `Popover`** for the profile dropdown
+- Uses **ShadCN `Avatar`** for user profile picture
+- Uses **Lucide React** icons (`User2`, `LogOut`)
+
+#### [`Home.jsx`](file:///c:/Users/samad/Downloads/JOB%20PORTAL/Frontend/src/components/components_lite/Home.jsx)
+Currently just renders `<Navbar/>`. The homepage content is a **TODO**.
+
+---
+
+### 🎨 `ui/` — ShadCN UI Primitives
+
+These are **copy-pasted ShadCN components** (not imported from npm). They are fully customizable:
+
+| Component | Used in |
+|---|---|
+| `button.jsx` | Navbar, Login |
+| `input.jsx` | Login, Register |
+| `label.jsx` | Login, Register |
+| `avatar.jsx` | Navbar |
+| `popover.jsx` | Navbar (profile dropdown) |
+| `radio-group.jsx` | Login, Register (Student/Recruiter toggle) |
+| `sonner.jsx` | Wraps `sonner` Toaster for theme support |
+
+---
+
+## 7️⃣ Tech Stack Summary
+
+| Tool | Role |
+|---|---|
+| **React 19** | UI library |
+| **Vite** | Build tool + dev server |
+| **React Router v7** | Client-side routing |
+| **Redux Toolkit** | Global state (loading, user) |
+| **Axios** | HTTP requests to backend |
+| **TailwindCSS v4** | Utility-first styling |
+| **ShadCN UI** | Pre-built accessible components |
+| **Sonner** | Toast notifications |
+| **Lucide React** | Icon library |
+
+---
+
+## 🔄 Full Data Flow (Login Example)
+
+```
+User fills form
+      │
+      ▼
+useState (local form state)
+      │
+      ▼
+submitHandler() called
+      │
+      ├─── dispatch(setLoading(true))  ──► Redux store.auth.loading = true
+      │                                         │
+      │                                         ▼
+      │                                   Spinner shown in UI
+      │
+      ├─── axios.post("/api/users/login")  ──► Backend
+      │         withCredentials: true           │
+      │                                         ▼
+      │                                   JWT cookie set in browser
+      │
+      ├─── success → navigate("/")
+      │    error   → toast.error()
+      │
+      └─── dispatch(setLoading(false)) ──► Spinner hidden
+```
+
+---
+
+## ⚠️ TODOs in Frontend
+
+1. **`user` in Navbar is hardcoded `false`** — needs to come from Redux store after login
+2. **Redux `authSlice` has no `user` state** — needs `setUser` action to persist logged-in user
+3. **`Home.jsx` is empty** — needs hero section, job listings, filters etc.
+4. **Only `/api/users` endpoint** is in `data.js` — needs `COMPANY_API_ENDPOINT`, `JOB_API_ENDPOINT`, `APPLICATION_API_ENDPOINT`
+
+Want me to **fix these TODOs** or do you want **5 Frontend questions** to test yourself? 🚀
