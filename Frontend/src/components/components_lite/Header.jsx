@@ -9,7 +9,7 @@ const Header = () => {
       <div className='text-center'>
         <div className='flex flex-col gap-5 my-10 '>
           <span className="px-4 mx-auto flex justify-center items-center py-2 gap-2 rounded-full bg-gray-200 text-red-600 font-medium">
-            <span className="text-[#614232]"><PiBuildingOfficeBold/></span><span>No.1 Job Hunt Platform</span>
+            <span className="text-[#614232]"><HiOutlineOfficeBuilding /></span><span>No.1 Job Hunt Platform</span>
           </span>
 
 
