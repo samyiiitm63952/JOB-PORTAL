@@ -6,6 +6,7 @@ import Home from './components/components_lite/Home'
 import PrivacyPolicy from './components/components_lite/PrivacyPolicy.jsx'
 import TermsofService from './components/components_lite/TermsofService.jsx'
 import Jobs from './components/components_lite/Jobs'
+import Browse from './components/components_lite/Browse'
 
 const appRoute = createBrowserRouter([
   {
@@ -31,6 +32,9 @@ const appRoute = createBrowserRouter([
   {
     path:"/jobs",
     element:<Jobs/>
+  },{
+    path:'/Browse',
+    element:<Browse/>
   }
 ])
 

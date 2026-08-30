@@ -23,7 +23,7 @@ const Navbar = () => {
                 <div className='flex items-center gap-10'>
                     <ul className='flex font-medium items-center gap-6'>
                         <Link to={"/"}><li>Home</li></Link>
-                        <Link to={"/jobs"}><li>Browse</li></Link>
+                        <Link to={"/Browse"}><li>Browse</li></Link>
                         <Link to={"/jobs"}><li>Job</li></Link>
                         
                     </ul>
