@@ -15,9 +15,8 @@ const Browse = () => {
                  randomJobs.map((item,i)=>{
                     return <Job/>
                  })
-            }
+              }
             </div>
-           
         </div>
     </div>
   )

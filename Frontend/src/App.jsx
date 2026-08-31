@@ -7,6 +7,7 @@ import PrivacyPolicy from './components/components_lite/PrivacyPolicy.jsx'
 import TermsofService from './components/components_lite/TermsofService.jsx'
 import Jobs from './components/components_lite/Jobs'
 import Browse from './components/components_lite/Browse'
+import Profile from './components/components_lite/Profile'
 
 const appRoute = createBrowserRouter([
   {
@@ -35,6 +36,9 @@ const appRoute = createBrowserRouter([
   },{
     path:'/Browse',
     element:<Browse/>
+  },{
+    path:'/Profile',
+    element:<Profile/>
   }
 ])
 
