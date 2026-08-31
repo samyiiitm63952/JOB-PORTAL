@@ -8,6 +8,7 @@ import TermsofService from './components/components_lite/TermsofService.jsx'
 import Jobs from './components/components_lite/Jobs'
 import Browse from './components/components_lite/Browse'
 import Profile from './components/components_lite/Profile'
+import Details from './components/components_lite/Details'
 
 const appRoute = createBrowserRouter([
   {
@@ -39,6 +40,9 @@ const appRoute = createBrowserRouter([
   },{
     path:'/Profile',
     element:<Profile/>
+  },{
+    path:'/Details/:id',
+    element:<Details/>
   }
 ])
 
