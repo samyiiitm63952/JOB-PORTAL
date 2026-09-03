@@ -1,24 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from './Navbar'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { Contact, Mail, Pen } from 'lucide-react'
 import { Badge } from '../ui/badge'
 import AppliedJob from './AppliedJob'
+import EditProfileModal from './EditProfileModal'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-const skills = [
-    "React.js",
-    "Node.js",
-    "Express.js",
-    "MongoDB",
-    "JavaScript",
-    "Docker",
-    "AWS"
-];
 
-const IsResume = true;
 
 const Profile = () => {
+    const [open, setOpen] = useState(false);
+    const { user } = useSelector((store) => store.auth);
+    const skills = user?.profile?.skills || [];
+    const isResume = user?.profile?.resume;
     return (
         <div>
             <Navbar />
@@ -30,20 +27,24 @@ const Profile = () => {
                             alt="@maxleiter"
                         />
                     </Avatar>
-                        <div><h1 className='font-medium text-xl'>Full Name</h1>
-                            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corrupti!</p></div>
+                        <div><h1 className='font-medium text-xl'>{user?.fullname}</h1>
+                            <p>{user?.profile?.bio || 'No bio added'}</p></div>
 
                     </div>
-                    <Button className={"text-right"} variant='outline'><Pen /></Button>
+                    <Button onClick={() => setOpen(true)} className={"text-right"} variant='outline'><Pen /></Button>
                 </div>
-                <div className='flex items-center gap-3 my-2'>
-                    <div className=''>
-                        <Mail />
-                    </div>
-                    <div className='flex items-center gap-3 my-2'>
-                        <span className=''>Samadkhan@gmail.com</span>
-                        <Contact />
-                        <span className=''>6395280880</span>
+                <div className="flex items-center gap-6 my-2">
+                    <a
+                        href={`mailto:${user?.email}`}
+                        className="flex items-center gap-2"
+                    >
+                        <Mail size={18} />
+                        <span>{user?.email}</span>
+                    </a>
+
+                    <div className="flex items-center gap-2">
+                       <a href={`tel:${user?.phoneNumber}`}> <Contact size={18} />
+                        <span>{user?.phoneNumber}</span></a>
                     </div>
                 </div>
                 <div>
@@ -63,7 +64,7 @@ const Profile = () => {
                         <label className='text-md font-bold'>Resume </label>
                         <div>
                             {
-                                IsResume ? <a target="_blank" href={"http://resume.com"} download="resume.pdf" className='text-blue-500 cursor-pointer hover:underline' >Download</a> : <span>No resume found</span>
+                                isResume ? <a target="_blank" href={isResume} download={user?.profile?.resumeOriginalName || 'resume.pdf'} className='text-blue-500 cursor-pointer hover:underline' >{user?.profile?.resumeOriginalName || 'Download Resume'}</a> : <span>No resume found</span>
                             }
                         </div>
                     </div>
@@ -75,6 +76,8 @@ const Profile = () => {
                 <AppliedJob />
             </div>
 
+            {/* Edit Profile Model */}
+            <EditProfileModal open={open} setOpen={setOpen} />
         </div>
     )
 }
