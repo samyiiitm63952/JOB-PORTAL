@@ -1,65 +1,95 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '../ui/button'
-import { Bookmark } from 'lucide-react'
-import { Avatar } from '../ui/avatar'
-import { AvatarImage } from '../ui/avatar'
+import { Bookmark, BookmarkCheck, MapPin, Briefcase, Clock } from 'lucide-react'
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
 import { Badge } from '../ui/badge'
 import { Link } from 'react-router-dom'
 
-const Job = () => {
-  const jobId = "erg";
+const Job = ({ job }) => {
+  const jobId = job?._id;
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  // Format date
+  const postedDate = job?.createdAt
+    ? new Date(job.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+
   return (
-    <div className="p-5 rounded-md shadow-xl bg-white border border-gray-100 w-full h-full flex flex-col">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
-          3 days ago
-        </p>
-        <Button variant="outline" className="rounded-full" size="icon">
-          <Bookmark />
-        </Button>
+    <div className="flex flex-col justify-between bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:border-purple-300 transition-all duration-200 group">
+
+      {/* Top Row — date + bookmark */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          <Clock size={12} />
+          <span>{postedDate}</span>
+        </div>
+        <button
+          onClick={() => setIsBookmarked(!isBookmarked)}
+          className={`p-1.5 rounded-full transition-colors ${isBookmarked ? 'text-purple-600 bg-purple-50' : 'text-gray-400 hover:text-purple-500 hover:bg-purple-50'}`}
+        >
+          {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+        </button>
       </div>
 
-      <div className="flex items-center gap-2 my-2">
-        <Button className="p-6 shrink-0" variant="outline" size="icon">
-          <Avatar>
-            <AvatarImage src='https://www.graphicpear.com/wp-content/uploads/2016/11/1.gif' />
-          </Avatar>
-        </Button>
+      {/* Company info */}
+      <div className="flex items-center gap-3 mb-4">
+        <Avatar className="h-12 w-12 rounded-xl border border-gray-100 shadow-sm">
+          <AvatarImage src={job?.company?.logo} className="object-contain p-1" />
+          <AvatarFallback className="rounded-xl bg-purple-100 text-purple-700 font-bold text-sm">
+            {job?.company?.name?.charAt(0) || 'C'}
+          </AvatarFallback>
+        </Avatar>
         <div>
-          <h1 className="font-medium text-lg">Company Name</h1>
-          <p className="text-sm text-gray-500">India</p>
+          <h2 className="font-semibold text-gray-800 text-sm leading-tight">{job?.company?.name}</h2>
+          <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+            <MapPin size={11} />
+            <span>{job?.location}</span>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1">
-        <h1 className="font-bold text-lg my-2">Title</h1>
-        <p className="text-sm text-gray-600">Description</p>
+      {/* Job title + description */}
+      <div className="mb-4 flex-1">
+        <h1 className="font-bold text-gray-900 text-base mb-1.5 group-hover:text-purple-700 transition-colors line-clamp-1">
+          {job?.title}
+        </h1>
+        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+          {job?.description}
+        </p>
       </div>
-      <div className="flex flex-wrap items-center gap-2 mt-4">
-        <Badge className={"text-blue-700 font-bold"} variant="ghost">
-          Positions
-        </Badge>
-        <Badge className={"text-[#F83002] font-bold"} variant="ghost">
 
+      {/* Badges */}
+      <div className="flex flex-wrap gap-2 mb-5">
+        <Badge variant="secondary" className="text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 border-0">
+          <Briefcase size={10} className="mr-1" />
+          {job?.position} Position{job?.position > 1 ? 's' : ''}
         </Badge>
-        <Badge className={"text-[#7209b7] font-bold"} variant="ghost">
-          20LPA
+        <Badge variant="secondary" className="text-xs font-medium bg-orange-50 text-orange-600 hover:bg-orange-100 border-0">
+          {job?.jobType}
+        </Badge>
+        <Badge variant="secondary" className="text-xs font-medium bg-purple-50 text-purple-700 hover:bg-purple-100 border-0">
+          ₹{job?.salary} LPA
         </Badge>
       </div>
-      <div className="flex flex-wrap items-center gap-4 mt-4">
-        <Link to={`/Details/${jobId}`}><Button
-          variant="outline"
-          className="flex-1 sm:flex-none cursor-pointer"
-        >
-          Details
-        </Button></Link>
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-3">
+        <Link to={`/Details/${jobId}`} className="flex-1">
+          <Button
+            variant="outline"
+            className="w-full text-sm font-medium border-gray-200 hover:border-purple-400 hover:text-purple-700 transition-colors"
+          >
+            Details
+          </Button>
+        </Link>
         <Button
-          className={"bg-[#7209b7] flex-1 sm:flex-none text-white"}> Save
+          className="flex-1 text-sm font-medium bg-[#7209b7] hover:bg-[#5a0791] text-white transition-colors"
+        >
+          Save
         </Button>
       </div>
     </div>
   );
 };
-
 
 export default Job
