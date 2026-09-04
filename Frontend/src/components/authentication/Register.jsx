@@ -7,9 +7,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { USER_API_ENDPOINT } from '@/utils/data'
 import { toast } from 'sonner'
 import axios from 'axios'
+import { Button } from '@base-ui/react'
+import { Loader2 } from 'lucide-react'
 
 const Register = () => {
-
+    const [loading,setLoading] = useState(false);
     const navigate = useNavigate()
     const [input, setInput] = useState({
         fullname: "",
@@ -32,6 +34,7 @@ const Register = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
             const formData = new FormData();
             formData.append("fullname", input.fullname);
             formData.append("email", input.email);
@@ -52,6 +55,7 @@ const Register = () => {
                 toast.success(res.data.message)
 
             }
+            setLoading(false)
         } catch (error) {
             console.log(error);
             const errorMessage = error.response?error.response.data.message:"An unexpected error occured";
@@ -99,9 +103,10 @@ const Register = () => {
                         <Label>Profile Photo</Label>
                         <Input type="file" accept="image/*" onChange={ChangeFilehandler} className="cursor-pointer" ></Input>
                     </div>
-                    <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
-                        Register
-                    </button>
+                    {loading?<Button><Loader2 className='mr-2 h-4 w-4 animate-spin' />Making an account for you</Button>: <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
+                            Register
+                        </button>}
+                    
                     {/* already account then login*/}
                     <p className='text-gray-500 text-md my-2'>
                         Already have an account? <Link to="/login" className='text-blue-500 font-semibold'>Login </Link>

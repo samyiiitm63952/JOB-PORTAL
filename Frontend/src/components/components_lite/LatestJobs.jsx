@@ -3,7 +3,7 @@ import JobCards from "./JobCard";
 import { useSelector } from "react-redux";
 
 const LatestJobs = ({ loading }) => {
-  const allJobs = useSelector((state) => state.jobs?.allJobs || []); 
+  const allJobs = useSelector((state) => state.job?.alljobs || []);
 
   return (
     <div className="max-w-7xl mx-auto my-20 px-4 md:px-8">
@@ -14,7 +14,7 @@ const LatestJobs = ({ loading }) => {
       {/* Job Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
         {loading ? (
-          [1, 2, 3, 4, 5, 6].map((n) => (
+          [1,2,3,4,5,6].map((n) => (
             <div
               key={n}
               className="p-5 rounded-md shadow-xl bg-white border border-gray-200 animate-pulse"

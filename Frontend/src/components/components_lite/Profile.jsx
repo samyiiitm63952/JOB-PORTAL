@@ -23,7 +23,7 @@ const Profile = () => {
                 <div className='flex justify-between'>
                     <div className='flex items-center gap-5'><Avatar className="cursor-pointer h-24 w-24">
                         <AvatarImage
-                            src="https://github.com/maxleiter.png"
+                            src={user?.profile?.profilePhoto}
                             alt="@maxleiter"
                         />
                     </Avatar>
@@ -64,7 +64,7 @@ const Profile = () => {
                         <label className='text-md font-bold'>Resume </label>
                         <div>
                             {
-                                isResume ? <a target="_blank" href={isResume} download={user?.profile?.resumeOriginalName || 'resume.pdf'} className='text-blue-500 cursor-pointer hover:underline' >{user?.profile?.resumeOriginalName || 'Download Resume'}</a> : <span>No resume found</span>
+                                isResume ? <a target="_blank" href={isResume?.replace('/upload/', '/upload/fl_attachment/')} download={user?.profile?.resumeOriginalname || 'resume.pdf'} className='text-blue-500 cursor-pointer hover:underline' >{user?.profile?.resumeOriginalname || 'Download Resume'}</a> : <span>No resume found</span>
                             }
                         </div>
                     </div>

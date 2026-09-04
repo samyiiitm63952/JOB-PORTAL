@@ -13,6 +13,9 @@ export const register =async(req, res) => {
                 success: false
             })
         }
+        const file = req.file;
+        const fileuri = getDataUri(file);
+        const cloudinaryResponse = await cloudinary.uploader.upload(fileuri.content);
         const user = await User.findOne({ email: email });
         if (user) {
             return res.status(400).json({
@@ -28,6 +31,10 @@ export const register =async(req, res) => {
             phoneNumber,
             password:hashedpassword,
             role,
+            profile:{
+                profilePhoto : cloudinaryResponse.secure_url,
+                
+            }
         })
         await newUser.save();
         return res.status(200).json({
@@ -133,7 +140,9 @@ export const updateProfile = async (req,res)=>{
         const {fullname,email,phoneNumber,bio,skills}= req.body;
         const file = req.file;
         const fileUri = getDataUri(file);
-        const cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content);
+        const cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: "raw"
+    });
         //cloudinary upload
 
         let skillsArray;
