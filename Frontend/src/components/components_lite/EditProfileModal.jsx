@@ -7,6 +7,7 @@ import axios from 'axios'
 import { USER_API_ENDPOINT } from '@/utils/data'
 import { toast } from 'sonner'
 import { setUser } from '@/redux/authSlice'
+import { Loader2 } from 'lucide-react'
 
 
 const EditProfileModal = ({ open, setOpen }) => {
@@ -36,18 +37,21 @@ const EditProfileModal = ({ open, setOpen }) => {
             formData.append("file",input.file);
         }
         try{
+            setLoading(true);
             const res = await axios.post(`${USER_API_ENDPOINT}/profile/update`,formData,{
                 headers:{"Content-Type":"multipart/form-data"},
                 withCredentials:true
             })
             if(res.data.success){
-                dispatch(setUser(res.data,user))
+                dispatch(setUser(res.data.user))
                 toast.success(res.data.message);
             }
-
         }catch(err){
             console.log(err)
             toast.error("Failed to update profile")
+        }
+        finally{
+            setLoading(false)
         }
         setOpen(false);
         console.log(input);
@@ -102,7 +106,7 @@ const EditProfileModal = ({ open, setOpen }) => {
                         </div>
                         <DialogFooter>
                            {
-                        loading?<Button><Loader2 className='mr-2 h-4 w-4 animate-spin' /> </Button>: <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
+                        loading?<Button><Loader2 className='mr-2 h-4 w-4 animate-spin' />Updating</Button>: <button type="submit" className='block w-full py-3 my-3 text-white bg-black hover:bg-black/90 rounded-md cursor-pointer'>
                             Save
                         </button>
                     }
