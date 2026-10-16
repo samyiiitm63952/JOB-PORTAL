@@ -4,24 +4,23 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
-import { JOB_API_ENDPOINT } from '@/utils/data'
+import { APPLICATION_API_ENDPOINT, JOB_API_ENDPOINT } from '@/utils/data'
 import { setSingleJob } from '@/redux/jobSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
 
 
 const Details = () => {
     const params = useParams();
     const jobId = params.id;
-    const user = useSelector((store) => store.user);
+    const user = useSelector((store) => store.auth.user);
     const { singleJob } = useSelector((store) => store.job);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     console.log("job id in des", jobId);
     
-    
-
-
+ 
     useEffect(() => {
         const fetchSingleJob = async () => {
             setLoading(true);
@@ -32,6 +31,7 @@ const Details = () => {
                 });
                 if (res.data.success) {
                     dispatch(setSingleJob(res.data.job));
+                    setIsApplied(res.data.job.application.some(application => application.applicant === user._id))
                 }
                 else {
                     setError("Failed to fetch jobs");
@@ -46,8 +46,26 @@ const Details = () => {
         }
         fetchSingleJob();
     }, [jobId, dispatch, user?._id]);
+    
+    const isInitiallyApplied = singleJob?.application?.some(application => application.applicant === user?._id) || false;
+   const [isApplied,setIsApplied] = useState(isInitiallyApplied);
+   const applyJobHandler = async() =>{
+        try{
+            const res = await axios.get(`${APPLICATION_API_ENDPOINT}/apply/${jobId}`,{withCredentials:true})
+            if(res.data.success){
+                console.log(res.data)
+                setIsApplied(true);
+                const updateSingleJob = {...singleJob,application:[...singleJob.application,{applicant:user?._id}]}
+                dispatch(setSingleJob(updateSingleJob))
+                toast.success(res.data.message);
+            }
+        }
+        catch(e){
+            console.log(e);
+            toast.error(e.response?.data?.message || "Failed to apply")
+        }
+    }
 
-    const isApplied = singleJob?.applications?.some(application => application.applicant === user?._id) || false;
 
     return (
         <div>
@@ -67,10 +85,11 @@ const Details = () => {
                     </div>
                     <div>
                         <Button
+                            onClick={isApplied ? null : applyJobHandler}
                             disabled={isApplied}
-                            className={`w-32 text-white rounded-md ${isApplied ? "bg-gray-500 cursor-not-allowed" : "bg-[#6B3AC2] cursor-pointer"}`}
+                            className={`w-36 rounded-md font-semibold ${isApplied ? "!bg-gray-400 !text-gray-700 cursor-not-allowed" : "!bg-[#6B3AC2] !text-white cursor-pointer hover:!bg-[#5a2fa8]"}`}
                         >
-                            {isApplied ? "Already Applied" : "Apply"}
+                            {isApplied ? "Already Applied" : "Apply Now"}
                         </Button>
                     </div>
                 </div>
@@ -97,7 +116,7 @@ const Details = () => {
                     <h1 className="font-bold my-1 ">
                         Total Applicants:{" "}
                         <span className=" pl-4 font-normal text-gray-800">
-                            {singleJob?.applications?.length}
+                            {singleJob?.application?.length}
                         </span>
                     </h1>
                     <h1 className="font-bold my-1 ">
