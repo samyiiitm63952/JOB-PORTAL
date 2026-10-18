@@ -13,9 +13,6 @@ export const register =async(req, res) => {
                 success: false
             })
         }
-        const file = req.file;
-        const fileuri = getDataUri(file);
-        const cloudinaryResponse = await cloudinary.uploader.upload(fileuri.content);
         const user = await User.findOne({ email: email });
         if (user) {
             return res.status(400).json({
@@ -23,17 +20,25 @@ export const register =async(req, res) => {
                 success: false,
             })
         }
+        // Upload profile photo only if a file was provided
+        let profilePhoto = "";
+        if (req.file) {
+            const fileuri = getDataUri(req.file);
+            if (fileuri) {
+                const cloudinaryResponse = await cloudinary.uploader.upload(fileuri.content);
+                profilePhoto = cloudinaryResponse.secure_url;
+            }
+        }
         //convert passwords to hashes
         const hashedpassword = await bcrypt.hash(password, 10);
-        const newUser= new User({
+        const newUser = new User({
             fullname,
             email,
             phoneNumber,
-            password:hashedpassword,
+            password: hashedpassword,
             role,
-            profile:{
-                profilePhoto : cloudinaryResponse.secure_url,
-                
+            profile: {
+                profilePhoto
             }
         })
         await newUser.save();
@@ -139,10 +144,15 @@ export const updateProfile = async (req,res)=>{
     try{
         const {fullname,email,phoneNumber,bio,skills}= req.body;
         const file = req.file;
-        const fileUri = getDataUri(file);
-        const cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: "raw"
-    });
+        let cloudinaryResponse;
+        if (file) {
+            const fileUri = getDataUri(file);
+            if (fileUri) {
+                cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content, {
+                    resource_type: "raw"
+                });
+            }
+        }
         //cloudinary upload
 
         let skillsArray;

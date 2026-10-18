@@ -18,9 +18,11 @@ const Details = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    console.log("job id in des", jobId);
-    
- 
+    const isInitiallyApplied = (singleJob?.application || singleJob?.applications)?.some(
+        application => application.applicant === user?._id || application.applicant?._id === user?._id
+    ) || false;
+    const [isApplied, setIsApplied] = useState(isInitiallyApplied);
+
     useEffect(() => {
         const fetchSingleJob = async () => {
             setLoading(true);
@@ -31,31 +33,37 @@ const Details = () => {
                 });
                 if (res.data.success) {
                     dispatch(setSingleJob(res.data.job));
-                    setIsApplied(res.data.job.application.some(application => application.applicant === user._id))
+                    const applied = (res.data.job.application || res.data.job.applications)?.some(
+                        application => application.applicant === user?._id || application.applicant?._id === user?._id
+                    ) || false;
+                    setIsApplied(applied);
                 }
                 else {
                     setError("Failed to fetch jobs");
                 }
             } catch (error) {
                 console.log(error);
-                setError(error.message || "Something went wrong");
+                setError(error.response?.data?.message || error.message || "Something went wrong");
             }
             finally {
                 setLoading(false);
             }
         }
-        fetchSingleJob();
+        if (jobId) {
+            fetchSingleJob();
+        }
     }, [jobId, dispatch, user?._id]);
-    
-    const isInitiallyApplied = singleJob?.application?.some(application => application.applicant === user?._id) || false;
-   const [isApplied,setIsApplied] = useState(isInitiallyApplied);
-   const applyJobHandler = async() =>{
+
+    const applyJobHandler = async() =>{
         try{
             const res = await axios.get(`${APPLICATION_API_ENDPOINT}/apply/${jobId}`,{withCredentials:true})
             if(res.data.success){
-                console.log(res.data)
                 setIsApplied(true);
-                const updateSingleJob = {...singleJob,application:[...singleJob.application,{applicant:user?._id}]}
+                const currentApps = singleJob?.application || singleJob?.applications || [];
+                const updateSingleJob = {
+                    ...singleJob, 
+                    application: [...currentApps, { applicant: user?._id }]
+                }
                 dispatch(setSingleJob(updateSingleJob))
                 toast.success(res.data.message);
             }
@@ -110,25 +118,25 @@ const Details = () => {
                     <h1 className="font-bold my-1 ">
                         Experience:{" "}
                         <span className=" pl-4 font-normal text-gray-800">
-                            {singleJob?.experienceLevel} Year
+                            {singleJob?.experienceLevel || singleJob?.experience || 0} Year
                         </span>
                     </h1>
                     <h1 className="font-bold my-1 ">
                         Total Applicants:{" "}
                         <span className=" pl-4 font-normal text-gray-800">
-                            {singleJob?.application?.length}
+                            {(singleJob?.application || singleJob?.applications)?.length || 0}
                         </span>
                     </h1>
                     <h1 className="font-bold my-1 ">
                         Job Type:
                         <span className=" pl-4 font-normal text-gray-800">
-                            {singleJob?.jobType}
+                            {singleJob?.jobType || "N/A"}
                         </span>
                     </h1>
                     <h1 className="font-bold my-1 ">
                         Post Date:
                         <span className=" pl-4 font-normal text-gray-800">
-                            {singleJob?.createdAt?.split("T")[0]}
+                            {singleJob?.createdAt ? singleJob.createdAt.split("T")[0] : "Recently"}
                         </span>
                     </h1>
                 </div>

@@ -58,6 +58,9 @@ const Register = () => {
             setLoading(false)
         } catch (error) {
             console.log(error);
+            if(error){
+                setLoading(false);
+            }
             const errorMessage = error.response?error.response.data.message:"An unexpected error occured";
             toast.error(errorMessage); 
         }
