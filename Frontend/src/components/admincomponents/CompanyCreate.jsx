@@ -17,7 +17,7 @@ const CompanyCreate = () => {
     const dispatch = useDispatch();
     const registerNewCompany = async () => {
         try {
-            const res = await axios.post(`${COMPANY_API_ENDPOINT}/register`, {CompanyName},{
+            const res = await axios.post(`${COMPANY_API_ENDPOINT}/register`, { companyName: CompanyName }, {
                 headers:{
                     "content-type":"application/json",
                 },

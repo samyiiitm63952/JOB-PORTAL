@@ -5,11 +5,6 @@ export const registerCompany = async (req, res) => {
         if (!companyName) {
             return res.status(400).json({ message: "Company name is required" })
         }
-        if (!description) {
-            return res.status(400).json({
-                message: "description is required"
-            })
-        }
         let company = await Company.findOne({ name: companyName })
         if (company) {
             return res.status(400).json({ message: "Company already exists" });
@@ -22,7 +17,7 @@ export const registerCompany = async (req, res) => {
         newCompany.save();
         return res.status(201).json({
             message: "Company created successfully",
-            newCompany,
+            company: newCompany,
             success: true
         })
     } catch (err) {
