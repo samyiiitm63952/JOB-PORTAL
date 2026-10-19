@@ -12,6 +12,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
+import { companySlice } from "./companySlice";
 // Custom storage — fixes Vite ESM + redux-persist CJS incompatibility
 const storage = {
   getItem: (key) => Promise.resolve(localStorage.getItem(key)),
@@ -28,6 +29,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   job: jobReducer,
+  company:companySlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

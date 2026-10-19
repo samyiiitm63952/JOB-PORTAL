@@ -1,15 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from '../components_lite/Navbar'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
 import { COMPANY_API_ENDPOINT } from '@/utils/data'
+import { useDispatch } from 'react-redux'
+import { setSingleCompany } from '@/redux/companySlice'
+import axios from 'axios'
+import { toast } from 'sonner'
 
 
 const CompanyCreate = () => {
     const navigate = useNavigate();
-    const [CompanyName, setCompanyName] = useState()
+    const [CompanyName, setCompanyName] = useState("")
+    const dispatch = useDispatch();
     const registerNewCompany = async () => {
         try {
             const res = await axios.post(`${COMPANY_API_ENDPOINT}/register`, {CompanyName},{
@@ -20,6 +25,7 @@ const CompanyCreate = () => {
             })
             console.log(res.data);
             if(res?.data?.success){
+                dispatch(setSingleCompany(res.data.company))
                 toast.success(res.data.message);
                 const companyId = res?.data?.company?._id;
                 navigate(`/admin/companies/${companyId}`)
