@@ -12,7 +12,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import companySlice from "./companySlice";
+import companySlice from "./companyslice";
 // Custom storage — fixes Vite ESM + redux-persist CJS incompatibility
 const storage = {
   getItem: (key) => Promise.resolve(localStorage.getItem(key)),

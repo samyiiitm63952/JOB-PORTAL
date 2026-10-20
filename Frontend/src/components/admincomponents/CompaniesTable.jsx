@@ -14,21 +14,32 @@ import { Edit2, MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const CompaniesTable = ({ filterText = "" }) => {
+
+const CompaniesTable = () => {
   const { companies, searchCompanyByText } = useSelector(
-    (store) => store.company || {}
+    (store) => store.company
   );
   const navigate = useNavigate();
+  const [filterCompany, setFilterCompany] = useState(companies);
 
-  const companyList = Array.isArray(companies) ? companies : [];
-  const text = (filterText || searchCompanyByText || "").toLowerCase();
-
-  const filterCompany = companyList.filter((company) => {
-    if (!text) return true;
-    return company?.name?.toLowerCase().includes(text);
-  });
+  useEffect(() => {
+    const filteredCompany =
+      companies.length >= 0 &&
+      companies.filter((company) => {
+        if (!searchCompanyByText) {
+          return true;
+        }
+        return company.name
+          ?.toLowerCase()
+          .includes(searchCompanyByText.toLowerCase());
+      });
+    setFilterCompany(filteredCompany);
+  }, [companies, searchCompanyByText]);
 
   console.log("COMPANIES", companies);
+  if (!companies) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -44,25 +55,21 @@ const CompaniesTable = ({ filterText = "" }) => {
         </TableHeader>
 
         <TableBody>
-          {filterCompany?.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center text-gray-500 py-6">
-                No Companies Added
-              </TableCell>
-            </TableRow>
+          {filterCompany.length === 0 ? (
+            <span>No Companies Added</span>
           ) : (
             filterCompany?.map((company) => (
-              <TableRow key={company._id || company.id}>
+              <TableRow key={company.id}>
                 <TableCell>
                   <Avatar>
                     <AvatarImage
-                      src={company?.logo || "default-logo-url"}
-                      alt={`${company?.name} logo`}
+                      src={company.logo || "default-logo-url"}
+                      alt={`${company.name} logo`}
                     />
                   </Avatar>
                 </TableCell>
-                <TableCell>{company?.name}</TableCell>
-                <TableCell>{company?.createdAt?.split("T")[0]}</TableCell>
+                <TableCell>{company.name}</TableCell>
+                <TableCell>{company.createdAt.split("T")[0]}</TableCell>
                 <TableCell className="text-right cursor-pointer">
                   <Popover>
                     <PopoverTrigger>

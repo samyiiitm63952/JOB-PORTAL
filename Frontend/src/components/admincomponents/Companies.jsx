@@ -1,44 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import Navbar from "../components_lite/Navbar";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import CompaniesTable from "./CompaniesTable";
+import { useNavigate } from "react-router-dom";
 
-import Navbar from '../components_lite/Navbar';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import CompaniesTable from './CompaniesTable';
-import { useNavigate } from 'react-router-dom';
-import useGetAllCompanies from '@/hooks/useGetAllCompanies';
+import useGetAllCompanies from "@/hooks/usegetAllCompanies";
+import { useDispatch } from "react-redux";
+import { setSearchCompanyByText } from "@/redux/companyslice.js";
 
 const Companies = () => {
-    useGetAllCompanies();
-    const navigate = useNavigate();
-    const [filterText, setFilterText] = useState('');
+  const navigate = useNavigate();
 
-    return (
-        <div>
-            <Navbar />
+  useGetAllCompanies();
+  const [input, setInput] = useState("");
+  const dispatch = useDispatch();
 
-            <div className="max-w-6xl mx-auto my-10">
-                <div className="flex items-center justify-between gap-4">
-                    <Input
-                        className="w-fit"
-                        placeholder="Filter by name"
-                        value={filterText}
-                        onChange={(e) => setFilterText(e.target.value)}
-                    />
-
-                    <Button
-                        className="bg-black rounded-2xl text-white"
-                        onClick={() => navigate('/admin/companies/create')}
-                    >
-                        Add Company
-                    </Button>
-                </div>
-
-                <div>
-                    <CompaniesTable filterText={filterText} />
-                </div>
-            </div>
+  useEffect(() => {
+    dispatch(setSearchCompanyByText(input));
+  }, [input]);
+  return (
+    <div>
+      <Navbar />
+      <div className="max-w-6xl mx-auto my-10 px-4 md:px-0">
+        <div className="flex flex-col sm:flex-row items-center justify-between my-5 gap-4 sm:gap-0">
+          <Input
+            className="w-full sm:w-fit"
+            placeholder="Filter by Name"
+            onChange={(e) => setInput(e.target.value)}
+          ></Input>
+          <Button className="w-full sm:w-auto" onClick={() => navigate("/admin/companies/create")}>
+            Add Company
+          </Button>
         </div>
-    );
+        <div className="overflow-x-auto">
+          <CompaniesTable />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Companies;

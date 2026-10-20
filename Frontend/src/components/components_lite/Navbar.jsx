@@ -21,20 +21,16 @@ const Navbar = () => {
     const {user} = useSelector((store)=>store.auth)
     const logouthandler=async ()=>{
         try{
-            const response = await axios.get(`${USER_API_ENDPOINT}/logout`,{
+            await axios.get(`${USER_API_ENDPOINT}/logout`,{
                 withCredentials:true
             });
-            if(response.data.success){
-                dispatch(setUser(null));
-                navigate("/")
-                toast.success("Logged out successfully");
-            }
+        } catch(error){
+            console.error(error);
+        } finally {
+            dispatch(setUser(null));
+            navigate("/");
+            toast.success("Logged out successfully");
         }
-        catch(error){
-            toast.error(error.response.data.message);
-            console.error(error)
-        }
-
     }
     return (
         <div className='bg-white'>
