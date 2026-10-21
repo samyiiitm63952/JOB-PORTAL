@@ -19,7 +19,7 @@ import { JOB_API_ENDPOINT } from "@/utils/data";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import useGetAllCompanies from "@/hooks/usegetAllCompanies";
+import useGetAllCompanies from "@/hooks/useGetAllCompanies";
 
 const companyArray = [];
 

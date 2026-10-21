@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
 import { COMPANY_API_ENDPOINT } from '@/utils/data'
 import { useDispatch } from 'react-redux'
-import { setSingleCompany } from '@/redux/companySlice'
+import { setSingleCompany } from '@/redux/companyslice'
 import axios from 'axios'
 import { toast } from 'sonner'
 
