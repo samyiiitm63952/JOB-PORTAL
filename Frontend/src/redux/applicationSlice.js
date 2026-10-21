@@ -1,16 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const application = createSlice({
-    name:"application",
-    initialState:{
-        application:[],
+const applicationSlice = createSlice({
+    name: "application",
+    initialState: {
+        applicants: null,
+        application: [],
     },
-    reducers:{
-        setSingleApplication:(state,action)=>{
-            state.setSingleApplication = action.payload;
+    reducers: {
+        setAllApplicants: (state, action) => {
+            state.applicants = action.payload;
+        },
+        setSingleApplication: (state, action) => {
+            state.application = action.payload;
         }
     }
-})
-export const {setSingleApplication} = applicationSlice.action;
+});
+
+export const { setAllApplicants, setSingleApplication } = applicationSlice.actions;
+export const applicationSliceReducer = applicationSlice.reducer;
 export default applicationSlice.reducer;
-export const applicationSliceReducer = application.reducer
