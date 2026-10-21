@@ -17,7 +17,7 @@ function PopoverTrigger({
 
 function PopoverContent({
   className,
-  align = "center",
+  align = "end",
   alignOffset = 0,
   side = "bottom",
   sideOffset = 4,
@@ -34,6 +34,7 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
+            "z-50 rounded-md border border-gray-200 bg-white p-2 text-gray-900 shadow-md outline-none",
             className
           )}
           {...props} />
