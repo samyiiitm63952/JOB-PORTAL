@@ -8,17 +8,27 @@ export const register =async(req, res) => {
         const { fullname, email, phoneNumber, password, role } = req.body;
         console.log(fullname, email, phoneNumber, password, role )
         if (!fullname || !email || !phoneNumber || !password || !role) {
-            return res.status(404).json({
+            return res.status(400).json({
                 message: "Missing required fields",
                 success: false
-            })
+            });
         }
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({
+            $or: [{ email }, { phoneNumber }]
+        });
         if (user) {
-            return res.status(400).json({
-                message: "Email already exists",
-                success: false,
-            })
+            if (user.email === email) {
+                return res.status(400).json({
+                    message: "User already exists with this email",
+                    success: false,
+                });
+            }
+            if (user.phoneNumber == phoneNumber) {
+                return res.status(400).json({
+                    message: "User already exists with this phone number",
+                    success: false,
+                });
+            }
         }
         // Upload profile photo only if a file was provided
         let profilePhoto = "";
@@ -49,9 +59,9 @@ export const register =async(req, res) => {
     }
 
     catch (error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({
-            message:"Server Error register user failed",
+            message:"Server error",
             success:false
         })
     }
