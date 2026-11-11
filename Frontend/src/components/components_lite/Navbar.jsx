@@ -14,6 +14,8 @@ import { toast } from 'sonner'
 import { USER_API_ENDPOINT } from '@/utils/data'
 import axios from 'axios'
 import { setUser } from '@/redux/authSlice'
+import { setSingleJob } from '@/redux/jobSlice'
+import { setAllAppliedJobs } from '@/redux/applicationSlice'
 
 
 const Navbar = () => {
@@ -29,6 +31,8 @@ const Navbar = () => {
             console.error(error);
         } finally {
             dispatch(setUser(null));
+            dispatch(setSingleJob(null));
+            dispatch(setAllAppliedJobs([]))
             navigate("/");
             toast.success("Logged out successfully");
         }

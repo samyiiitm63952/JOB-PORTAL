@@ -129,40 +129,45 @@ export const togglebookmarkcontroller = async(req,res)=>{
         })
     }
 }
-export const updateProfilePhoto = async(req,res)=>{
-    try{
+export const updateProfilePhoto = async (req, res) => {
+    try {
         const user = await User.findById(req.id);
-        if(!user){
+        if (!user) {
             return res.status(404).json({
-                message:"User not found",
-                succcess:false
-            })
+                message: "User not found",
+                success: false
+            });
         }
         const file = req.file;
-        if(!file){
-            return res.status(404).json({
-                message:"Select Photo Again",
-                success:false
-            })
+        if (!file) {
+            return res.status(400).json({
+                message: "Please select a photo",
+                success: false
+            });
         }
-        let cloudinaryResponse;
         const fileUri = getDataUri(file);
-        if(fileUri){
-            cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content,{
-                resource_type:"image"
-            })
+        if (!fileUri) {
+            return res.status(400).json({
+                message: "Invalid image file",
+                success: false
+            });
         }
+        const cloudinaryResponse = await cloudinary.uploader.upload(fileUri.content, {
+            resource_type: "image"
+        });
         user.profile.profilePhoto = cloudinaryResponse.secure_url;
-        return res.status(200).json({
-            message:"Profile Photo Updated",
-            success:true
-        })
+        await user.save();
 
-    }catch(err){
+        return res.status(200).json({
+            message: "Profile Photo Updated",
+            profilePhoto: user.profile.profilePhoto,
+            success: true
+        });
+    } catch (err) {
         console.log(err);
         return res.status(500).json({
-            message:"Server error",
-            success:false
-        })
+            message: "Server error",
+            success: false
+        });
     }
 }

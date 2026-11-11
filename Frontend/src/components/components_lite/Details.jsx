@@ -18,9 +18,11 @@ const Details = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const isInitiallyApplied = (singleJob?.application || singleJob?.applications)?.some(
-        application => application.applicant === user?._id || application.applicant?._id === user?._id
-    ) || false;
+    const isInitiallyApplied = user?._id
+        ? (singleJob?.application || singleJob?.applications)?.some(
+              application => application.applicant === user._id || application.applicant?._id === user._id
+          ) || false
+        : false;
     const [isApplied, setIsApplied] = useState(isInitiallyApplied);
 
     useEffect(() => {
@@ -33,9 +35,11 @@ const Details = () => {
                 });
                 if (res.data.success) {
                     dispatch(setSingleJob(res.data.job));
-                    const applied = (res.data.job.application || res.data.job.applications)?.some(
-                        application => application.applicant === user?._id || application.applicant?._id === user?._id
-                    ) || false;
+                    const applied = user?._id
+                        ? (res.data.job.application || res.data.job.applications)?.some(
+                              application => application.applicant === user._id || application.applicant?._id === user._id
+                          ) || false
+                        : false;
                     setIsApplied(applied);
                 }
                 else {
@@ -55,6 +59,10 @@ const Details = () => {
     }, [jobId, dispatch, user?._id]);
 
     const applyJobHandler = async() =>{
+        if (!user) {
+            toast.error("Please login to apply for this job");
+            return;
+        }
         try{
             const res = await axios.get(`${APPLICATION_API_ENDPOINT}/apply/${jobId}`,{withCredentials:true})
             if(res.data.success){
