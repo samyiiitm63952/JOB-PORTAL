@@ -56,10 +56,11 @@ export const getAppliedjobs = async (req, res) => {
         const applications = await Application.find({ applicant: userId }).sort({ createdAt: -1 }).populate({
             path: "job", options: { sort: { createdAt: -1 } }, populate: { path: "company" }
         });
-        if (applications.length == 0) {
-            return res.status(404).json({
+        if (!applications || applications.length === 0) {
+            return res.status(200).json({
                 message: "No job found with this user id",
-                success: false
+                applications: [],
+                success: true
             })
         }
         return res.status(200).json({

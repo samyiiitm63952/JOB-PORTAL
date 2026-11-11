@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Label } from '../ui/label'
 import { useDispatch, useSelector } from 'react-redux'
-import { setSelectedFilters, clearAllFilters } from '@/redux/jobSlice'
-import { X } from 'lucide-react'
+import { setSelectedFilters, clearAllFilters, setSearchedQuery } from '@/redux/jobSlice'
+import { X, Search } from 'lucide-react'
 
 const filterData = [
   {
@@ -30,14 +30,27 @@ const filterData = [
 
 const Filtercard = () => {
   const dispatch = useDispatch();
-  const selectedFilters = useSelector((store) => store.job.selectedFilters) || {
+  const { searchedQuery, selectedFilters: storeFilters } = useSelector((store) => store.job);
+  const [searchText, setSearchText] = useState(searchedQuery || "");
+
+  const selectedFilters = storeFilters || {
     Location: [],
     Industry: [],
     Experience: [],
     Salary: []
   };
 
-  // Toggle a single checkbox value in a category
+  const handleSearch = (e) => {
+    const val = e.target.value;
+    setSearchText(val);
+    dispatch(setSearchedQuery(val));
+  };
+
+  const handleClearSearch = () => {
+    setSearchText("");
+    dispatch(setSearchedQuery(""));
+  };
+
   const handleCheckboxChange = (filterType, item) => {
     const currentList = selectedFilters[filterType] || [];
     const isAlreadySelected = currentList.includes(item);
@@ -105,8 +118,27 @@ const Filtercard = () => {
 
       <hr className='mt-3 mb-2 border-gray-100' />
 
+      {/* Search Bar */}
+      <div className='relative mb-3'>
+        <Search size={14} className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none' />
+        <input
+          type="text"
+          value={searchText}
+          onChange={handleSearch}
+          placeholder="Search jobs..."
+          className='w-full pl-8 pr-8 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-200 bg-gray-50 transition-all placeholder:text-gray-400'
+        />
+        {searchText && (
+          <button onClick={handleClearSearch} className='absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+            <X size={13} />
+          </button>
+        )}
+      </div>
+
+      <hr className='mb-3 border-gray-100' />
+
       {/* Categories with multi-select checkboxes */}
-      <div className='space-y-4 max-h-[75vh] overflow-y-auto pr-1'>
+      <div className='space-y-4'>
         {filterData.map((data, i) => {
           const categoryCount = selectedFilters[data.filterType]?.length || 0;
           return (
@@ -119,8 +151,8 @@ const Filtercard = () => {
                   </span>
                 )}
               </div>
-              <div className='space-y-1.5 max-h-40 overflow-y-auto pr-1'>
-                {data.array.map((item, j) => {
+              <div className='space-y-1.5'>
+                {data.array.slice(0, 5).map((item, j) => {
                   const id = `filter-${i}-${j}`;
                   const isChecked = selectedFilters[data.filterType]?.includes(item);
                   return (

@@ -1,9 +1,23 @@
 import { Button } from "../ui/button"
 import { Search } from 'lucide-react'
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setSearchedQuery } from '@/redux/jobSlice';
 
 const Header = () => {
+  const [query, setQuery] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const searchJobHandler = () => {
+    if (query.trim()) {
+      dispatch(setSearchedQuery(query.trim()));
+      navigate("/Browse");
+    }
+  };
+
   return (
     <div>
       <div className='text-center'>
@@ -22,8 +36,15 @@ const Header = () => {
           </p>
 
           <div className='flex w-[40%] shadow-lg border border-gray-300 pl-4 rounded-full items-center mx-auto'>
-            <input type="text" placeholder='Find your Dream Job ' className='outline-none border-none w-full' />
-            <Button className="rounded-r-full h-10 cursor-pointer bg-black" >
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && searchJobHandler()}
+              placeholder='Find your Dream Job'
+              className='outline-none border-none w-full'
+            />
+            <Button onClick={searchJobHandler} className="rounded-r-full h-10 cursor-pointer bg-black" >
               <Search className='h-5 w-5 invert'></Search>
             </Button>
           </div>

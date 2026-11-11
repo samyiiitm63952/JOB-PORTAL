@@ -15,12 +15,12 @@ const EditProfileModal = ({ open, setOpen }) => {
     const [loading,setLoading] = useState(false);
     const {user}= useSelector((store)=>store.auth);
     const [input,setInput] = useState({
-        name:user?.fullname,
-        email:user?.email,
-        phone:user?.phoneNumber,
-        bio:user?.profile?.bio,
-        skills:user?.profile?.skills.map((skills)=>skills),
-        file:user?.profile?.resume
+        name:user?.fullname || "",
+        email:user?.email || "",
+        phone:user?.phoneNumber || "",
+        bio:user?.profile?.bio || "",
+        skills:user?.profile?.skills ? user?.profile?.skills.join(', ') : "",
+        file:user?.profile?.resume || null
     })
     const changeEventHandler=(e)=>{
         setInput({...input,[e.target.name]:e.target.value});
@@ -30,6 +30,7 @@ const EditProfileModal = ({ open, setOpen }) => {
         const formData = new FormData();
         formData.append("fullname",input.name);
         formData.append("email",input.email);
+        formData.append("phoneNumber",input.phone);
         formData.append("phone",input.phone);
         formData.append("bio",input.bio);
         formData.append("skills",input.skills);
@@ -94,9 +95,9 @@ const EditProfileModal = ({ open, setOpen }) => {
                                   onChange={changeEventHandler}  type="text" id="bio" value={input.bio} name='bio' className='w-full col-span-3 border border-gray-300 rounded-md p-2'
                                 />
                             </div>
-                            <div>
+                            <div className='grid grid-cols-4 items-center gap-4'>
                                 <Label htmlFor="skills" className={"text-right"}>Skills</Label>
-                                <input onChange={changeEventHandler} type='text' id='skills' name='skills' className='col-span-3 border border-gray-300 rounded-md p-2'/>
+                                <input onChange={changeEventHandler} type='text' id='skills' name='skills' value={input.skills} className='w-full col-span-3 border border-gray-300 rounded-md p-2'/>
                             </div>
                             {/* Resume file upload */}
                             <div className='grid grid-cols-4 items-center gap-4'>

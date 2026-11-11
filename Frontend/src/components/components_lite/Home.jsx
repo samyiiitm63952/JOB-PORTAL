@@ -18,7 +18,7 @@ const Home = () => {
     }
   })
   return (
-    <div>
+    <div className='px-4'>
       <Navbar />
       <Header />
       <Categories />

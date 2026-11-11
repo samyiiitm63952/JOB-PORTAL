@@ -9,9 +9,11 @@ import { toast } from 'sonner'
 import axios from 'axios'
 import { Button } from '@base-ui/react'
 import { Loader2 } from 'lucide-react'
+import OtpModal from './OtpModal'
 
 const Register = () => {
     const [loading,setLoading] = useState(false);
+    const [showOtpModal, setShowOtpModal] = useState(false);
     const navigate = useNavigate()
     const [input, setInput] = useState({
         fullname: "",
@@ -33,38 +35,82 @@ const Register = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
+        if (!input.fullname || !input.email || !input.password || !input.phoneNumber || !input.role) {
+            toast.error("Please fill all required fields");
+            return;
+        }
+
         try {
             setLoading(true);
+            const res = await axios.post(`${USER_API_ENDPOINT}/send-otp`, {
+                email: input.email
+            }, {
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (res.data.success) {
+                toast.success(res.data.message || "Verification code sent to your email!");
+                setShowOtpModal(true);
+            }
+        } catch (error) {
+            console.error(error);
+            const errorMessage = error.response?.data?.message || "Failed to send verification code";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const verifyAndRegisterHandler = async (otp) => {
+        try {
             const formData = new FormData();
             formData.append("fullname", input.fullname);
             formData.append("email", input.email);
             formData.append("password", input.password);
             formData.append("role", input.role);
             formData.append("phoneNumber", input.phoneNumber);
+            formData.append("otp", otp);
             if (input.file) {
                 formData.append("file", input.file);
             }
+
             const res = await axios.post(`${USER_API_ENDPOINT}/register`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 },
                 withCredentials: true
-            })
-            if (res.data.success) {
-                navigate("/login");
-                toast.success(res.data.message)
+            });
 
+            if (res.data.success) {
+                setShowOtpModal(false);
+                toast.success(res.data.message || "Account created successfully!");
+                navigate("/login");
             }
-            setLoading(false)
         } catch (error) {
-            console.log(error);
-            if(error){
-                setLoading(false);
-            }
-            const errorMessage = error.response?error.response.data.message:"An unexpected error occured";
-            toast.error(errorMessage); 
+            console.error(error);
+            const errorMessage = error.response?.data?.message || "Registration failed";
+            toast.error(errorMessage);
+            throw error; // Rethrow so modal stops loading
         }
-    }
+    };
+
+    const resendOtpHandler = async () => {
+        try {
+            const res = await axios.post(`${USER_API_ENDPOINT}/send-otp`, {
+                email: input.email
+            }, {
+                headers: { "Content-Type": "application/json" }
+            });
+            if (res.data.success) {
+                toast.success("A new verification code has been sent!");
+            }
+        } catch (error) {
+            console.error(error);
+            const errorMessage = error.response?.data?.message || "Failed to resend code";
+            toast.error(errorMessage);
+            throw error;
+        }
+    };
     
     return (
         <div>
@@ -117,6 +163,15 @@ const Register = () => {
                 </form>
 
             </div>
+
+            {/* OTP Verification Modal */}
+            <OtpModal
+                open={showOtpModal}
+                setOpen={setShowOtpModal}
+                email={input.email}
+                onVerify={verifyAndRegisterHandler}
+                onResend={resendOtpHandler}
+            />
         </div>
     )
 }

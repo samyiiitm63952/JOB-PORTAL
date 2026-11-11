@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema({
         default:'Student',
         required:true,
     },
+    bookmarks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Job"
+    }]
+    ,
     profile:{
         bio:{
             type:String

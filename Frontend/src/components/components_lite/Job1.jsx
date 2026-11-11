@@ -1,13 +1,41 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Button } from '../ui/button'
 import { Bookmark, BookmarkCheck, MapPin, Briefcase, Clock } from 'lucide-react'
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
 import { Badge } from '../ui/badge'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { USER_API_ENDPOINT } from '@/utils/data'
+import { toast } from 'sonner'
+import axios from 'axios'
+import { setUser } from '@/redux/authSlice'
 
 const Job = ({ job }) => {
   const jobId = job?._id;
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
+  const isBookmarked = user?.bookmarks?.includes(jobId);
+
+  const handleBookmark = async () => {
+    if (!user) {
+      toast.error("Please login to bookmark jobs");
+      return;
+    }
+    try {
+      const res = await axios.post(
+        `${USER_API_ENDPOINT}/bookmark/${jobId}`,
+        {},
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        dispatch(setUser({ ...user, bookmarks: res.data.bookmarks }));
+        toast.success(res.data.message);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to bookmark job");
+    }
+  };
 
   // Format date
   const postedDate = job?.createdAt
@@ -24,7 +52,7 @@ const Job = ({ job }) => {
           <span>{postedDate}</span>
         </div>
         <button
-          onClick={() => setIsBookmarked(!isBookmarked)}
+          onClick={handleBookmark}
           className={`p-1.5 rounded-full transition-colors ${isBookmarked ? 'text-purple-600 bg-purple-50' : 'text-gray-400 hover:text-purple-500 hover:bg-purple-50'}`}
         >
           {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
@@ -83,9 +111,10 @@ const Job = ({ job }) => {
           </Button>
         </Link>
         <Button
-          className="flex-1 text-sm font-medium bg-[#7209b7] hover:bg-[#5a0791] text-white transition-colors"
+          onClick={handleBookmark}
+          className="flex-1 text-sm font-medium bg-[#7209b7] hover:bg-[#5a0791] text-white transition-colors cursor-pointer"
         >
-          Save
+          {isBookmarked ? "Saved" : "Save"}
         </Button>
       </div>
     </div>

@@ -1,49 +1,41 @@
-import React from "react";
-import JobCards from "./JobCard";
+import React, { useState } from "react";
+import JobCard from "./JobCard";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const LatestJobs = ({ loading }) => {
+const LatestJobs = () => {
   const allJobs = useSelector((state) => state.job?.alljobs || []);
+  const validJobs = allJobs.filter((job) => job?._id).slice(0, 6);
+  const navigate = useNavigate();
+  // Track currently hovered card ID (shuru me null = koi blur nahi)
+  const [hoveredId, setHoveredId] = useState(null);
 
   return (
-    <div className="max-w-7xl mx-auto my-20 px-4 md:px-8">
+    <div className="max-w-7xl select-none mx-auto my-20 px-4 md:px-8">
       <h2 className="text-3xl md:text-4xl font-bold">
         <span className="text-[#6A38C2]">Latest & Top </span>Job Openings
       </h2>
 
       {/* Job Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
-        {loading ? (
-          [1,2,3,4,5,6].map((n) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 my-5">
+        {validJobs.length === 0 ? (
+          <span className="text-gray-500">No Job Available</span>
+        ) : (
+          validJobs.map((job) => (
             <div
-              key={n}
-              className="p-5 rounded-md shadow-xl bg-white border border-gray-200 animate-pulse"
+              key={job._id}
+              onMouseEnter={() => setHoveredId(job._id)}
+              onMouseLeave={() => setHoveredId(null)}
+              onClick={()=>{navigate(`/Details/${job._id}`)}}
+              className={`transition-all duration-300 ${
+                hoveredId && hoveredId !== job._id ? "blur-[2px] opacity-75" : ""
+              } ${
+                hoveredId === job._id ? "scale-105" : ""
+              }`}
             >
-              <div className="h-4 w-1/3 rounded bg-gray-200" />
-              <div className="h-5 w-3/4 rounded bg-gray-200 my-3" />
-              <div className="space-y-2">
-                <div className="h-2 w-full rounded bg-gray-200" />
-                <div className="h-2 w-5/6 rounded bg-gray-200" />
-              </div>
-              <div className="flex gap-2 mt-4">
-                <div className="h-5 w-16 rounded bg-gray-200" />
-                <div className="h-5 w-12 rounded bg-gray-200" />
-                <div className="h-5 w-14 rounded bg-gray-200" />
-              </div>
+              <JobCard job={job} />
             </div>
           ))
-        ) : allJobs.length === 0 ? (
-          <span>No Job Available</span>
-        ) : (
-          allJobs
-            .slice(0, 6)
-            .map((job) =>
-              job?._id ? (
-                <JobCards key={job._id} job={job}></JobCards>
-              ) : (
-                <span key={Math.random()}>Invalid Job Data</span>
-              )
-            )
         )}
       </div>
     </div>
