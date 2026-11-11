@@ -26,7 +26,7 @@ const Categories = () => {
 
   const searchJobHandler = (category) => {
     dispatch(setSearchedQuery(category));
-    navigate("/Browse");
+    navigate("/jobs");
   };
 
   return (

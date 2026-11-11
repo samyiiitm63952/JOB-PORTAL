@@ -42,7 +42,8 @@ const Navbar = () => {
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
                 <div className='cursor-pointer' onClick={()=>{navigate("/")}}>
                     <h1 className=' font-bold'>
-                       <span className='text-[#FA4F09] text-4xl' >Intern</span>  <span className='text-[#6B3AC2] text-2xl'>Portal</span>
+                       <span className={`text-4xl transition-colors duration-300 ${user ? 'text-[#6B3AC2]' : 'text-[#FA4F09]'}`}>Intern</span>{' '}
+                       <span className={`text-2xl transition-colors duration-300 ${user ? 'text-[#FA4F09]' : 'text-[#6B3AC2]'}`}>Portal</span>
                     </h1>
                 </div>
                 <div className='flex items-center gap-10'>
