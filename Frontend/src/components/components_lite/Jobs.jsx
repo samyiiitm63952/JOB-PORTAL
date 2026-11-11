@@ -20,7 +20,8 @@ const Jobs = () => {
         job.title?.toLowerCase().includes(q) ||
         job.description?.toLowerCase().includes(q) ||
         job.location?.toLowerCase().includes(q) ||
-        job.jobType?.toLowerCase().includes(q)
+        job.jobType?.toLowerCase().includes(q) ||
+        job.company?.name?.toLowerCase().includes(q)
       );
     }
 

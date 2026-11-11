@@ -14,7 +14,7 @@ const Header = () => {
   const searchJobHandler = () => {
     if (query.trim()) {
       dispatch(setSearchedQuery(query.trim()));
-      navigate("/Browse");
+      navigate("/jobs");
     }
   };
 
