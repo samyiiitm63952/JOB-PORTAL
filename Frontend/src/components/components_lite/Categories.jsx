@@ -48,7 +48,7 @@ const Categories = () => {
                   <Button
                     onClick={() => searchJobHandler(category)}
                     variant="outline"
-                    className="cursor-pointer rounded-full border-gray-200 hover:border-purple-300 hover:text-purple-700"
+                    className="cursor-pointer rounded-full bg-white border-gray-200 shadow-xs hover:border-purple-300 hover:text-purple-700 hover:bg-purple-50"
                   >
                     {category}
                   </Button>

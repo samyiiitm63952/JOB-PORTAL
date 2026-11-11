@@ -82,28 +82,52 @@ const appRoute = createBrowserRouter([
 function App() {
   const { user } = useSelector((store) => store.auth);
   const [showSweep, setShowSweep] = useState(false);
+  const [showSparkle, setShowSparkle] = useState(false);
 
   useEffect(() => {
+    document.body.classList.toggle("logged-in", Boolean(user));
+    document.body.classList.toggle("role-recruiter", user?.role === "Recruiter");
+
     if (user && sessionStorage.getItem("showLoginThemeSweep") === "true") {
       sessionStorage.removeItem("showLoginThemeSweep");
       setShowSweep(true);
-      const timer = setTimeout(() => setShowSweep(false), 1000);
-      return () => clearTimeout(timer);
+      setShowSparkle(true);
+      const sweepTimer = setTimeout(() => setShowSweep(false), 1000);
+      const sparkleTimer = setTimeout(() => setShowSparkle(false), 1700);
+      return () => {
+        clearTimeout(sweepTimer);
+        clearTimeout(sparkleTimer);
+      };
     }
   }, [user]);
 
+  const isRecruiter = user?.role === "Recruiter";
+
   return (
-    <div>
+    <div className="relative min-h-screen">
+      {/* One-time sparkle wave across base dots when logged in */}
+      {showSparkle && (
+        <>
+          <div className={`fixed inset-0 z-0 pointer-events-none ${isRecruiter ? "sparkle-dots-recruiter-1" : "sparkle-dots-student-1"}`} />
+          <div className={`fixed inset-0 z-0 pointer-events-none ${isRecruiter ? "sparkle-dots-recruiter-2" : "sparkle-dots-student-2"}`} />
+          <div className={`fixed inset-0 z-0 pointer-events-none ${isRecruiter ? "sparkle-dots-recruiter-3" : "sparkle-dots-student-3"}`} />
+        </>
+      )}
+
+      {/* Blurry transparent color sweep from sticker across screen */}
       {showSweep && (
         <div
-          className={`fixed inset-0 z-50 pointer-events-none animate-login-sweep bg-gradient-to-bl ${
-            user?.role === 'Recruiter'
-              ? 'from-[#FA4F09] via-[#ea580c] to-[#fb923c]'
-              : 'from-[#6B3AC2] via-[#7c3aed] to-[#9333ea]'
+          className={`fixed inset-0 z-50 pointer-events-none backdrop-blur-md animate-login-sweep bg-gradient-to-bl ${
+            isRecruiter
+              ? 'from-[#FA4F09]/35 via-[#ea580c]/25 to-[#fb923c]/15'
+              : 'from-[#6B3AC2]/35 via-[#7c3aed]/25 to-[#9333ea]/15'
           }`}
         />
       )}
-      <RouterProvider router={appRoute}></RouterProvider>
+
+      <div className="relative z-10">
+        <RouterProvider router={appRoute}></RouterProvider>
+      </div>
     </div>
   )
 }
