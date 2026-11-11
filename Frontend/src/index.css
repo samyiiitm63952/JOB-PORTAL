@@ -2,3 +2,22 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+
+@keyframes loginSweepFromSticker {
+  0% {
+    clip-path: circle(0% at min(calc(50% + 600px), calc(100% - 40px)) 104px);
+    opacity: 0.9;
+  }
+  50% {
+    clip-path: circle(160% at min(calc(50% + 600px), calc(100% - 40px)) 104px);
+    opacity: 0.85;
+  }
+  100% {
+    clip-path: circle(160% at min(calc(50% + 600px), calc(100% - 40px)) 104px);
+    opacity: 0;
+  }
+}
+
+.animate-login-sweep {
+  animation: loginSweepFromSticker 1s ease-out forwards;
+}

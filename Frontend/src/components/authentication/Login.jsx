@@ -39,6 +39,7 @@ const Login = () => {
                 withCredentials: true
             })
             if (res.data.success) {
+                sessionStorage.setItem("showLoginThemeSweep", "true");
                 dispatch(setUser(res.data.user));
                 navigate("/");
                 toast.success(res.data.message)

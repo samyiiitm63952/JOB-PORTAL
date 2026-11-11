@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import Login from "./components/authentication/Login"
 import Register from "./components/authentication/Register"
 import Home from './components/components_lite/Home'
@@ -79,8 +80,29 @@ const appRoute = createBrowserRouter([
 ])
 
 function App() {
+  const { user } = useSelector((store) => store.auth);
+  const [showSweep, setShowSweep] = useState(false);
+
+  useEffect(() => {
+    if (user && sessionStorage.getItem("showLoginThemeSweep") === "true") {
+      sessionStorage.removeItem("showLoginThemeSweep");
+      setShowSweep(true);
+      const timer = setTimeout(() => setShowSweep(false), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
   return (
     <div>
+      {showSweep && (
+        <div
+          className={`fixed inset-0 z-50 pointer-events-none animate-login-sweep bg-gradient-to-bl ${
+            user?.role === 'Recruiter'
+              ? 'from-[#FA4F09] via-[#ea580c] to-[#fb923c]'
+              : 'from-[#6B3AC2] via-[#7c3aed] to-[#9333ea]'
+          }`}
+        />
+      )}
       <RouterProvider router={appRoute}></RouterProvider>
     </div>
   )

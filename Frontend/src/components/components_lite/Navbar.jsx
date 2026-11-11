@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { LogOut, User2 } from 'lucide-react'
+import { FaGraduationCap, FaBuilding } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 import { USER_API_ENDPOINT } from '@/utils/data'
@@ -108,6 +109,21 @@ const Navbar = () => {
                    
                 </div>
             </div>
+
+            {user && (
+                <div className='max-w-7xl mx-auto relative '>
+                    <div
+                        title={user.role === 'Recruiter' ? 'Company (Recruiter)' : 'College (Student)'}
+                        className='hidden md:block absolute right-0 top-4 text-neutral-800 opacity-85'
+                    >
+                        {user.role === 'Recruiter' ? (
+                            <FaBuilding size={48} />
+                        ) : (
+                            <FaGraduationCap size={52} />
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
