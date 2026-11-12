@@ -13,10 +13,10 @@ const JobCard = ({ job }) => {
             <AvatarFallback>{job?.company?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
         </div>
-        <p className='text-sm text-gray-600'>india</p>
+        <p className='text-sm text-gray-600'>{job?.company?.location}</p>
 
         <div>
-          <h2 className='font-bold text-lg my-2'>{job?.title}</h2>
+          <h2 className='font-semibold text-lg my-2'>{job?.title}</h2>
           <p className='text-sm text-gray-600'>
             {job?.description}
           </p>
@@ -24,10 +24,10 @@ const JobCard = ({ job }) => {
       </div>
 
       <div className='flex flex-wrap gap-2 items-center mt-4'>
-        <Badge className={"text-blue-600 font-bold rounded-md"} variant='outline'>{job?.position}</Badge>
-        <Badge className={"text-[#FA4F09] font-bold rounded-md"} variant='outline'>{job?.salary} LPA</Badge>
-        <Badge className={"text-[#6B3AC2] font-bold rounded-md"} variant='outline'>{job?.location}</Badge>
-        <Badge className={"text-black font-bold rounded-md"} variant='outline'>{job?.jobType}</Badge>
+        <Badge className={"text-blue-600  rounded-md"} variant='outline'>{job?.position}</Badge>
+        <Badge className={"text-[#FA4F09] rounded-md"} variant='outline'>{job?.salary} LPA</Badge>
+        <Badge className={"text-[#6B3AC2]  rounded-md"} variant='outline'>{job?.location}</Badge>
+        <Badge className={"text-black  rounded-md"} variant='outline'>{job?.jobType}</Badge>
       </div>
     </div>
   )
